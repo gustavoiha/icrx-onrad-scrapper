@@ -1,0 +1,19 @@
+{
+  "name": "icrx-onrad-scrapper",
+  "version": "1.0.0",
+  "description": "Scrapper for icrx-onrad",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^19.9.0",
+    "simple-json-db": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}
