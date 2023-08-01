@@ -28,8 +28,8 @@ const openPage = async () => {
   page = await browser.newPage();
 
   await page.setViewport({
-    width: 1600,
-    height: 1600
+    width: 1800,
+    height: 1800
   });
 
   await page.goto(ROOT_URL);
@@ -128,7 +128,7 @@ const downloadAllExams = async () => {
 
     await link.click();
 
-    await delay(1200);
+    await delay(1500);
 
     await downloadExam();
   }
@@ -140,7 +140,7 @@ const downloadExam = async () => {
 
   await examPage.waitForSelector('#empresa');
 
-  const companyName = await examPage.evaluate(() => document.getElementById('empresa').textContent);
+  const companyName = await examPage.evaluate(() => document.getElementById('empresa').textContent.trim());
   const personName = await examPage.evaluate(() => {
     const nameFieldText = document.getElementsByClassName(`titulo_oit`)[3].textContent;
 
@@ -149,12 +149,19 @@ const downloadExam = async () => {
 
   const folder = `${companyName}/${DAY_TO_FILTER}-${MONTH_TO_FILTER}-${YEAR_TO_FILTER}`;
 
-  if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true })
+  // create folder if does not exist
+  if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true });
 
-  await examPage.screenshot({
-    path: `${folder}/${personName}.png`,
-    fullPage: true,
-    type: 'png'
+  // get amount of files for the same person
+  const amountOfExamsForSamePerson = fs.readdirSync(folder).filter(
+    (file) => file.startsWith(personName)
+  ).length || 0;
+
+  const suffix = amountOfExamsForSamePerson >= 1 ? ` (${amountOfExamsForSamePerson + 1})` : ''
+
+  await examPage.pdf({
+    path: `${folder}/${personName}${suffix}.pdf`,
+    fullPage: true
   });
 
   await examPage.close();
