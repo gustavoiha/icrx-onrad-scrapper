@@ -3,6 +3,7 @@
 const puppeteer = require('puppeteer');
 const JSONdb = require('simple-json-db');
 const delay = require('./delay');
+const fs = require('fs');
 
 const authenticationDb = new JSONdb('./db/authentication.json');
 
@@ -25,6 +26,11 @@ const getCredentials = () => ({
 const openPage = async () => {
   browser = await puppeteer.launch({ headless: false });
   page = await browser.newPage();
+
+  await page.setViewport({
+    width: 1600,
+    height: 1600
+  });
 
   await page.goto(ROOT_URL);
 }
@@ -118,19 +124,40 @@ const downloadAllExams = async () => {
   const links = await page.$$('[title="Visualizar laudo"]');
 
   for (const link of links) {
-    await downloadExam(link);
+    console.log('Opening an exam');
+
+    await link.click();
+
+    await delay(1200);
+
+    await downloadExam();
   }
 }
 
-const downloadExam = async (link) => {
-  console.log('Opening an exame');
+const downloadExam = async () => {
+  const pages = await browser.pages();
+  const examPage = pages.slice(-1)[0];
 
-  await link.click();
+  await examPage.waitForSelector('#empresa');
 
-  // const newTarget = await this._browser.waitForTarget(target => target.opener() === page.target);
-  // const newPage = await newTarget.page();
+  const companyName = await examPage.evaluate(() => document.getElementById('empresa').textContent);
+  const personName = await examPage.evaluate(() => {
+    const nameFieldText = document.getElementsByClassName(`titulo_oit`)[3].textContent;
 
-  // await newPage.waitForSelector('body');
+    return nameFieldText.replace('NOME: ', '').trim();
+  });
+
+  const folder = `${companyName}/${DAY_TO_FILTER}-${MONTH_TO_FILTER}-${YEAR_TO_FILTER}`;
+
+  if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true })
+
+  await examPage.screenshot({
+    path: `${folder}/${personName}.png`,
+    fullPage: true,
+    type: 'png'
+  });
+
+  await examPage.close();
 }
 
 // Run the script
@@ -146,4 +173,8 @@ const downloadExam = async (link) => {
   await examsToLoad();
 
   await downloadAllExams();
+
+  await browser.close();
+
+  console.log('Finished script!');
 })()
