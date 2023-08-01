@@ -1,6 +1,7 @@
 const prompts = require('prompts');
 const JSONdb = require('simple-json-db');
 const setupDb = new JSONdb('./db/setup.json');
+const createDate = require('./models/date');
 
 module.exports = async () => {
   const dateResponse = await prompts([{
@@ -15,5 +16,5 @@ module.exports = async () => {
 
   setupDb.set('lastDateToFilter', dateResponse.dateToFilter.toISOString());
 
-  return dateResponse.dateToFilter;
+  return createDate(dateResponse.dateToFilter);
 }

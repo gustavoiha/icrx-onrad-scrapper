@@ -6,15 +6,11 @@ const login = require('./src/login');
 const filterPeriod = require('./src/filter-period');
 const downloadExams = require('./src/download-exams');
 
-const createDate = require('./src/models/date');
-
-const dateToFilter = createDate();
-
 // Run the script
 (async () => {
   console.log('Starting script');
 
-  dateToFilter.date = await setup();
+  const dateToFilter = await setup();
 
   const { browser, page } = await openBrowser();
 
