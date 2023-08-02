@@ -30,7 +30,7 @@ const downloadExam = async (browser, dateToFilter) => {
 
   console.log(`Saving ${personName}'s exam`);
 
-  const folder = `${companyName}/${dateToFilter.day}-${dateToFilter.month}-${dateToFilter.year}`;
+  const folder = `db/exams/${companyName}/${dateToFilter.day}-${dateToFilter.month}-${dateToFilter.year}`;
 
   // create folder if does not exist
   if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true });
