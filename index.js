@@ -3,6 +3,7 @@
 const setup = require('./src/setup');
 const openBrowser = require('./src/open-browser');
 const login = require('./src/login');
+const setLinesPerPage = require('./src/set-lines-per-page');
 const filterPeriod = require('./src/filter-period');
 const downloadExams = require('./src/download-exams');
 
@@ -15,6 +16,8 @@ const downloadExams = require('./src/download-exams');
   const { browser, page } = await openBrowser();
 
   await login(page);
+
+  await setLinesPerPage(page);
 
   await filterPeriod(page, dateToFilter);
 
